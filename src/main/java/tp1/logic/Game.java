@@ -1,44 +1,79 @@
 package tp1.logic;
 
+import java.util.ArrayList;
+import java.util.List;
+import tp1.logic.Position;
+import tp1.logic.gameobjects.Land;
+import tp1.view.Messages;
+
 public class Game {
 
 	public static final int DIM_X = 30;
 	public static final int DIM_Y = 15;
 
-	//TODO fill your code
+	//marcador
+	private int time = 10;
+	private int points = 0;
+	private int lives = 3;
+
+	//estado final
+	private boolean finished = false;
+	private boolean playerWon = false;
+	private boolean playerLost = false;
+
+	private final List<Land> lands = new ArrayList<>();
+
+
 	
 	public Game(int nLevel) {
-		// TODO Auto-generated constructor stub
+		for (int col = 0; col < DIM_X; col++) {
+			lands.add(new Land(new Position(DIM_Y - 1, col)));
+		}
+
 	}
 	
 	public String positionToString(int col, int row) {
-		// TODO Auto-generated method stub
-		return null;
+		Position p = new Position(row, col);
+    for (Land land : lands) {
+        if (land.getPosition().equals(p)) return land.getIcon();
+    }
+    return Messages.EMPTY;
 	}
 
-	public boolean playerWins() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isFinished() { return finished; }
+
+	public boolean playerWins() { return playerWon; }
+
+	public boolean playerLoses() { return playerLost; }  
+
+	public int remainingTime() { return time; }
+
+	public int points() { return points; }
+
+	public int numLives() { return lives; }
+
+	public void update() { // baja el tiempo uno si no ha acabado
+		if (finished)
+			return;
+
+		if (time > 0) {
+			time--;
+			if (time == 0) { //game over si no hay tiempo
+				finished = true;
+				playerLost = true;
+			}
+		}
 	}
 
-	public boolean playerLoses() {
-		// TODO Auto-generated method stub
-		return false;
-	}  
-
-	public int remainingTime() {
-		// TODO Auto-generated method stub
-		return 100;
-	}
-
-	public int points() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int numLives() {
-		// TODO Auto-generated method stub
-		return 3;
+	public void loseLife() { // quita vida y si llega a 0 pierde
+		if (finished)
+			return;
+		if (lives > 0)
+			lives--;
+		if (lives == 0) {
+			finished = true;
+			playerLost = true;
+		}
 	}
 
 	@Override
