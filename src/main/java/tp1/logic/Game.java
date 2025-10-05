@@ -3,7 +3,7 @@ package tp1.logic;
 import java.util.ArrayList;
 import java.util.List;
 import tp1.logic.Position;
-import tp1.logic.gameobjects.Land;
+import tp1.logic.gameobjects.*;
 import tp1.view.Messages;
 
 public class Game {
@@ -11,78 +11,48 @@ public class Game {
 	public static final int DIM_X = 30;
 	public static final int DIM_Y = 15;
 
+	private int nLevel;
+
 	//marcador
-	private int time = 10;
+	private int remainingTime = 100;
 	private int points = 0;
-	private int lives = 3;
+	private int numLives = 3;
 
 	//estado final
 	private boolean finished = false;
 	private boolean playerWon = false;
 	private boolean playerLost = false;
 
+	private GameObjectContainer gameObjects = new GameObjectContainer();
+	private Mario mario;
+
 	private final List<Land> lands = new ArrayList<>();
 
 
 	
 	public Game(int nLevel) {
-		for (int col = 0; col < DIM_X; col++) {
-			lands.add(new Land(new Position(DIM_Y - 1, col)));
-		}
-
+		this.nLevel = nLevel;
+    	initLevel(nLevel);
 	}
-	
-	public String positionToString(int col, int row) {
-		Position p = new Position(row, col);
-    for (Land land : lands) {
-        if (land.getPosition().equals(p)) return land.getIcon();
+	 private void initLevel(int nLevel) {
+        if (nLevel == 0) initLevel0();
+        else initLevel1();
     }
-    return Messages.EMPTY;
-	}
-
-	public boolean isFinished() { return finished; }
-
-	public boolean playerWins() { return playerWon; }
-
-	public boolean playerLoses() { return playerLost; }  
-
-	public int remainingTime() { return time; }
-
-	public int points() { return points; }
-
-	public int numLives() { return lives; }
-
-	public void update() { // baja el tiempo uno si no ha acabado
-		if (finished)
-			return;
-
-		if (time > 0) {
-			time--;
-			if (time == 0) { //game over si no hay tiempo
-				finished = true;
-				playerLost = true;
-			}
-		}
-	}
-
-	public void loseLife() { // quita vida y si llega a 0 pierde
-		if (finished)
-			return;
-		if (lives > 0)
-			lives--;
-		if (lives == 0) {
-			finished = true;
-			playerLost = true;
-		}
-	}
-
-	@Override
-	public String toString() {
-		// TODO returns a textual representation of the object
-		return "TODO: Hola soy el game";
+	
+	private void resetScoreAndState() {
+    	remainingTime = 100;
+    	points = 0;
+    	numLives = 3;
+    	finished = false;
+    	playerWon = false;
+    	playerLost = false;
 	}
 	
-	/*
+	private void initLevel1() {
+    
+    initLevel0();
+}
+	
 	private void initLevel0() {
 		this.nLevel = 0;
 		this.remainingTime = 100;
@@ -125,5 +95,53 @@ public class Game {
 
 		gameObjects.add(new Goomba(this, new Position(0, 19)));
 	}
-	*/
+
+	public String positionToString(int col, int row) {
+    	return gameObjects.stringAt(new Position(row, col));
+	}
+
+
+	public boolean isFinished() { return finished; }
+
+	public boolean playerWins() { return playerWon; }
+
+	public boolean playerLoses() { return playerLost; }  
+
+	public int remainingTime() { return remainingTime; }
+
+	public int points() { return points; }
+
+	public int numLives() { return numLives; }
+
+	public void update() { // baja el tiempo uno si no ha acabado
+		if (finished)
+			return;
+
+		if (remainingTime > 0) {
+			remainingTime--;
+			if (remainingTime == 0) { //game over si no hay tiempo
+				finished = true;
+				playerLost = true;
+			}
+		}
+	}
+
+	public void loseLife() { // quita vida y si llega a 0 pierde
+		if (finished)
+			return;
+		if (numLives > 0)
+			numLives--;
+		if (numLives == 0) {
+			finished = true;
+			playerLost = true;
+		}
+	}
+
+	@Override
+	public String toString() {
+		// TODO returns a textual representation of the object
+		return "TODO: Hola soy el game";
+	}
+	
+	
 }

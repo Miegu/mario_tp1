@@ -15,6 +15,7 @@ public class Mario {
 	public Mario(Position pos) {
 		this.pos = pos;
 	}
+	public Mario(Game game, Position pos) { this(pos); }
 	public Mario(Position pos, boolean big){
 		this.pos = pos;
 		this.big = big;

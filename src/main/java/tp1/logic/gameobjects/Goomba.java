@@ -1,5 +1,6 @@
 package tp1.logic.gameobjects;
 
+import tp1.logic.Game;
 import tp1.logic.Position;
 
 public class Goomba {
@@ -8,6 +9,7 @@ public class Goomba {
     public Goomba(Position pos) {
         this.pos = pos;
     }
+    public Goomba(Game game, Position pos) { this(pos); }
 
     public Position getPosition() {
         return pos;

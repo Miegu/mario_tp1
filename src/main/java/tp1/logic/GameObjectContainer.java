@@ -1,6 +1,112 @@
 package tp1.logic;
 
+import tp1.logic.gameobjects.*; //land, goomba, exitDoor, mario
+import tp1.view.Messages;
+
 public class GameObjectContainer {
-	//TODO fill your code
+	
+	private static final int MAX_LANDS = Game.DIM_X * Game.DIM_Y;
+	private static final int MAX_GOOMBAS = 64;
+
+	private final Land[] lands = new Land[MAX_LANDS];
+	private int nLands = 0;
+
+	private final Goomba[] goombas = new Goomba[MAX_GOOMBAS];
+	private int nGoombas = 0;
+
+	private ExitDoor exit = null;
+	private Mario mario = null;
+
+	//add sobrecargados
+
+	//Land es solid
+	public void add(Land land){
+		if (land==null) return;
+		Position p = land.getPosition();
+		//si ya hay land
+		for (int i= 0; i<nLands; i++){
+			if(lands[i].getPosition().equals(p))return;
+		}
+		//hay otra cosa
+		if(exit != null && exit.getPosition().equals(p))return;
+		if(mario != null && mario.getPosition().equals(p))return;
+		for (int i = 0; i<nGoombas; i++){
+			if(goombas[i].getPosition().equals(p))return;
+		}
+		//anado
+		if(nLands < lands.length) lands[nLands++] = land;
+	}
+
+	//goomba no es solido, pero no puede estar sobre land
+	public void add(Goomba g) {
+        if (g == null) return;
+        Position p = g.getPosition();
+        //hay un land
+		for (int i = 0; i<nLands; i++){
+			if(lands[i].getPosition().equals(p)) return;
+		}
+		if (nGoombas < goombas.length) goombas[nGoombas++]=g;
+    }
+
+	//exit door no es solido, pero no puede estar sobre land
+	public void add(ExitDoor d) {
+        if (d == null) return;
+        Position p = d.getPosition();
+        //hay land abajo
+		for(int i=0; i<nLands; i++){
+			if(lands[i].getPosition().equals(p)) return;
+		}
+        exit = d; //si ya habia, sustituyo
+    }
+
+	//mario no es solido, pero no puede estar sobre land
+	public void add(Mario m) {
+        if (m == null) return;
+		Position base = m.getPosition();
+		//hay land
+        for (int i=0; i<nLands; i++){
+			if(lands[i].getPosition().equals(base))return;
+		}
+        mario = m; //si ya habia sustituyo
+    }
+
+	//pintado
+
+	//prioridad draw: mario, goombs, door, land, void
+
+	public String stringAt(Position p) {
+		if(mario  != null && mario.getPosition().equals(p)){
+			return mario.getIcon();
+		}
+		for (int i = 0; i < nGoombas; i++){
+			if(goombas[i].getPosition().equals(p)){
+				return goombas[i].getIcon();
+			}
+		}
+		if (exit != null && exit.getPosition().equals(p)){
+			return exit.getIcon();
+		}
+		for (int i = 0; i < nLands; i++){
+			if(lands[i].getPosition().equals(p)){
+				return lands[i].getIcon();
+			}
+		}
+		return Messages.EMPTY;
+
+	}
+
+
+	public void updateAll(){
+		//update para goombas y mario
+	}
+
+	public void clear(){
+		for (int i=0; i<nLands; i++) lands[i]=null;
+		for (int i=0; i<nGoombas; i++) goombas[i]=null;
+		nLands = 0;
+    	nGoombas = 0;
+    	exit = null;
+    	mario = null;
+	}
 
 }
