@@ -19,6 +19,14 @@ public class GameObjectContainer {
 
 	//add sobrecargados
 
+	public boolean isSolidAt(Position p) {
+		for (int i = 0; i < nLands; i++) {
+			if (lands[i].getPosition().equals(p))
+				return true;
+		}
+		return false;
+	}
+
 	//Land es solid
 	public void add(Land land){
 		if (land==null) return;
@@ -47,6 +55,17 @@ public class GameObjectContainer {
 		}
 		if (nGoombas < goombas.length) goombas[nGoombas++]=g;
     }
+
+	public void removeGoomba(Goomba g) {
+		for (int i = 0; i < nGoombas; i++) {
+			if (goombas[i] == g) {
+				goombas[i] = goombas[nGoombas - 1];//compacto vector
+				goombas[nGoombas - 1] = null;
+				nGoombas--;
+				return;
+			}
+		}
+	}
 
 	//exit door no es solido, pero no puede estar sobre land
 	public void add(ExitDoor d) {
@@ -96,8 +115,12 @@ public class GameObjectContainer {
 	}
 
 
-	public void updateAll(){
-		//update para goombas y mario
+	public void updateAll() {
+		if (mario != null)
+			mario.update(); // primero Mario
+		for (int i = 0; i < nGoombas; i++) { // luego goombas
+			goombas[i].update();
+		}
 	}
 
 	public void clear(){

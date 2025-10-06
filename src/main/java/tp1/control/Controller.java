@@ -23,35 +23,61 @@ public class Controller {
 	 */
 	
 
-
+	
 	public void run() {
 		view.showWelcome();
+		boolean repaint = true;
+		boolean running = true;
+		String finalMsg = null;
 
-		while (!game.isFinished()){
-			//pinta marcador y tablero
-			view.showGame();
+		while (running && !game.isFinished()) {
+			// pinta marcador y tablero
+			if (repaint)
+				view.showGame();
+			repaint = false;
 
-			//lee enter, help o exit
+			// lee enter, help o exit
 			String[] words = view.getPrompt();
-			String cmd = (words.length == 0) ? "": words[0].trim().toLowerCase();
+			String cmd = (words.length == 0) ? "" : words[0].trim().toLowerCase();
 
-			if ("help".equals(cmd)) {
-            	view.showMessage(tp1.view.Messages.HELP);
-        	} else if ("exit".equals(cmd)) {
-            	break; //sale del juego
-        	}
+			boolean doUpdate = false;
 
-			game.update(); //baja time en 1
+			if ("exit".equals(cmd) || "e".equals(cmd)) {
+				finalMsg = "Player leaves game.";
+				running = false;
 
-			if (game.playerLoses()) {
-				view.showMessage("Player loses");
+			} else if ("help".equals(cmd) || "h".equals(cmd)) {
+				view.showMessage(tp1.view.Messages.HELP);
+
+			} else if ("reset".equals(cmd) || "r".equals(cmd)) {
+				if (words.length >= 2) {
+					try {
+						int lvl = Integer.parseInt(words[1]); //0 o 1
+						game.reset(lvl);
+					} catch (NumberFormatException e) {
+						game.reset();
+					}
+				} else {
+					game.reset();
+				}
+				repaint = true; //cambia tablero y tiempo
+
+			} else if ("".equals(cmd) || "update".equals(cmd) || "u".equals(cmd)) {
+				doUpdate = true;
+
 			} else {
-				view.showEndMessage();
+				view.showMessage("Error: Unknown command: " + String.join(" ", words));
 			}
+			if (doUpdate) {
+				game.update();
+				repaint = true;
+			}
+			view.showMessage("Error: Unknown command: " + String.join(" ", words));
 		}
+
+		if (finalMsg != null) view.showMessage(finalMsg);//exit
 		
-		
-		view.showEndMessage();
+		else view.showEndMessage();
 	}
 
 }

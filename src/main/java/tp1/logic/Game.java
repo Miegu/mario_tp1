@@ -113,9 +113,11 @@ public class Game {
 
 	public int numLives() { return numLives; }
 
-	public void update() { // baja el tiempo uno si no ha acabado
-		if (finished)
-			return;
+	public void update() { //baja el tiempo uno si no ha acabado
+		if (finished) return;
+
+		gameObjects.updateAll();     // mueve Mario y Goombas aquí
+    	if (finished) return;
 
 		if (remainingTime > 0) {
 			remainingTime--;
@@ -126,7 +128,21 @@ public class Game {
 		}
 	}
 
-	public void loseLife() { // quita vida y si llega a 0 pierde
+	public void reset(Integer mayLevel){
+		int target = (mayLevel == null) ? this.nLevel : mayLevel;
+    	if (target != 0 && target != 1) target = this.nLevel;
+
+ 		int keepPoints = this.points;
+    	int keepLives  = this.numLives;
+
+    	if (target == 0) initLevel0();
+    	else             initLevel1();
+
+    	this.points   = keepPoints;//conserva
+    	this.numLives = keepLives;
+	}
+
+	public void loseLife() { //quita vida y si llega a 0 pierde
 		if (finished)
 			return;
 		if (numLives > 0)
@@ -137,11 +153,44 @@ public class Game {
 		}
 	}
 
+	public void marioDies() {
+		loseLife();
+
+		if (!finished) {
+			if (nLevel == 0)//si queda vidas pos reset
+				initLevel0();
+			else
+				initLevel1();
+		}
+	}
+
 	@Override
 	public String toString() {
 		// TODO returns a textual representation of the object
 		return "TODO: Hola soy el game";
 	}
 	
+	public void reset() {
+		int keepPoints = this.points;
+		int keepLives = this.numLives;
+
+		if (nLevel == 0) //recarga level
+			initLevel0();
+		else
+			initLevel1();
+
+		this.points = keepPoints;
+		this.numLives = keepLives;
+	}
+
+	public void reset(int level) {
+		if (level == 0 || level == 1)
+			this.nLevel = level;
+		reset();
+	}
 	
+	public void removeGoomba(tp1.logic.gameobjects.Goomba g) {
+    	gameObjects.removeGoomba(g);
+	}	
+
 }

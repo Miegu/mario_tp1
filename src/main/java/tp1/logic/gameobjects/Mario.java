@@ -8,26 +8,19 @@ public class Mario {
 
 	public enum Facing{ LEFT, RIGHT};
 
+	private final Game game;
 	private Position pos;
+	private int dx = +1;
 	private Facing facing = Facing.RIGHT;
 	private boolean big = false;  //si fuera true, ocuparia la tile de arriba
 
-	public Mario(Position pos) {
-		this.pos = pos;
-	}
-	public Mario(Game game, Position pos) { this(pos); }
-	public Mario(Position pos, boolean big){
-		this.pos = pos;
-		this.big = big;
+	
+	public Mario(Game game, Position pos) {
+		this.game = game;
+		this.pos= pos;
 	}
 	public Position getPosition() {
-		return pos;
-	}
-	public boolean isBig(){
-		return big;
-	}
-	public void setBig(boolean b){
-		this.big = b;
+   	 	return pos;
 	}
 	public Facing getFacing(){
 		return facing;
@@ -51,6 +44,33 @@ public class Mario {
 	 *  Implements the automatic update	
 	 */
 	public void update() {
-		//TODO fill your code
+		int r = pos.getRow();
+		int c = pos.getCol();
+
+		String below = game.positionToString(c, r + 1);
+		boolean hasFloor = tp1.view.Messages.LAND.equals(below);
+
+		if (!hasFloor) {
+			pos = new Position(r + 1, c);//cae 1
+
+			//fuera tablero muere jaja
+			if (pos.getRow() >= Game.DIM_Y) {
+				game.marioDies(); //pierde vida y reset
+			}
+
+			return;
+		}
+
+		//suelo
+		int nextC = c + dx;
+		boolean hitsWall = (nextC < 0 || nextC >= Game.DIM_X);
+		boolean landAhead = !hitsWall && tp1.view.Messages.LAND.equals(
+				game.positionToString(nextC, r));
+
+		if (hitsWall || landAhead) {
+			dx = -dx; //se giraa
+			return;
+		}
+		pos = new Position(r, nextC); //avanza
 	}
 }
