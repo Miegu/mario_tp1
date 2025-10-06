@@ -1,7 +1,7 @@
 package tp1.logic.gameobjects;
 
 import tp1.logic.Position;
-
+import tp1.logic.Action;
 import tp1.logic.Game;
 
 public class Mario {
@@ -43,34 +43,73 @@ public class Mario {
 	/**
 	 *  Implements the automatic update	
 	 */
+	
 	public void update() {
-		int r = pos.getRow();
-		int c = pos.getCol();
+		boolean moved = false;
 
-		String below = game.positionToString(c, r + 1);
-		boolean hasFloor = tp1.view.Messages.LAND.equals(below);
+		while (!game.getActions().isEmpty()) {
+			Action act = game.getActions().extract();
 
-		if (!hasFloor) {
-			pos = new Position(r + 1, c);//cae 1
+			switch (act) {
+				case LEFT:
+					dx = -1;
+					pos = pos.translate(dx, 0);
+					moved = true;
+					break;
 
-			//fuera tablero muere jaja
-			if (pos.getRow() >= Game.DIM_Y) {
-				game.marioDies(); //pierde vida y reset
+				case RIGHT:
+					dx = 1;
+					pos = pos.translate(dx, 0);
+					moved = true;
+					break;
+
+				case UP:
+					pos = pos.translate(0, -1);
+					moved = true;
+					break;
+
+				case DOWN:
+					while (!tp1.view.Messages.LAND.equals(
+							game.positionToString(pos.getCol(), pos.getRow() + 1))) {
+						pos = pos.translate(0, 1);
+					}
+					dx = 0; //para x
+					moved = true;
+					break;
+
+				case STOP:
+					dx = 0;
+					break;
+			}
+		}
+
+		//movimiento automático
+		if (!moved) {
+			int r = pos.getRow();
+			int c = pos.getCol();
+
+			String below = game.positionToString(c, r + 1);
+			boolean hasFloor = tp1.view.Messages.LAND.equals(below);
+
+			if (!hasFloor) {
+				pos = new Position(r + 1, c);
+				if (pos.getRow() >= Game.DIM_Y) {
+					game.marioDies();
+				}
+				return;
 			}
 
-			return;
-		}
+			int nextC = c + dx;
+			boolean hitsWall = (nextC < 0 || nextC >= Game.DIM_X);
+			boolean landAhead = !hitsWall && tp1.view.Messages.LAND.equals(
+					game.positionToString(nextC, r));
 
-		//suelo
-		int nextC = c + dx;
-		boolean hitsWall = (nextC < 0 || nextC >= Game.DIM_X);
-		boolean landAhead = !hitsWall && tp1.view.Messages.LAND.equals(
-				game.positionToString(nextC, r));
-
-		if (hitsWall || landAhead) {
-			dx = -dx; //se giraa
-			return;
+			if (hitsWall || landAhead) {
+				dx = -dx;
+			} else {
+				pos = new Position(r, nextC);
+			}
 		}
-		pos = new Position(r, nextC); //avanza
 	}
+
 }

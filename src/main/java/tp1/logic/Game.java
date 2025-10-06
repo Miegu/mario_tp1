@@ -27,6 +27,7 @@ public class Game {
 	private Mario mario;
 
 	private final List<Land> lands = new ArrayList<>();
+	private final ActionList actions = new ActionList();
 
 
 	
@@ -192,5 +193,14 @@ public class Game {
 	public void removeGoomba(tp1.logic.gameobjects.Goomba g) {
     	gameObjects.removeGoomba(g);
 	}	
+
+	public void addAction(Action a) {
+		actions.add(a);
+	}
+
+	public ActionList getActions() {
+		return actions;
+	}
+
 
 }
