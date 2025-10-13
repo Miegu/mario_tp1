@@ -12,7 +12,7 @@ public class ActionList {
         actions.add(act);
     }
 
-    public void add(List<Action> acts) { // varias
+    public void add(List<Action> acts) { //varias
         // actions.addAll(acts);
         List<Action> filtered = new ArrayList<>();
 

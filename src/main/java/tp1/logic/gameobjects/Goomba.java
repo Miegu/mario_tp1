@@ -8,6 +8,13 @@ public class Goomba {
     private final Game game;
     private Position pos;
     private int dx = -1;
+
+    private boolean alive = true;
+
+    public boolean isAlive() {
+        return alive;
+    }
+
    
     public Goomba(Game game, Position pos) {
         this.game = game;
@@ -54,6 +61,12 @@ public class Goomba {
         }
 
         pos = new Position(r, nextC);//delante
+    }
+ 
+    public boolean receiveInteraction(Mario other) {
+        this.alive = false;
+        game.addPoints(100);
+        return true;
     }
 
 

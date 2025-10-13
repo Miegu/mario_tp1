@@ -29,11 +29,17 @@ public class Game {
 	private final List<Land> lands = new ArrayList<>();
 	private final ActionList actions = new ActionList();
 
-
+	public GameObjectContainer getGameObjectContainer() {
+		return gameObjects;
+	}
 	
 	public Game(int nLevel) {
 		this.nLevel = nLevel;
-    	initLevel(nLevel);
+		resetScoreAndState();
+		if (nLevel == 0)
+			initLevel0();
+		else
+			initLevel1();
 	}
 	 private void initLevel(int nLevel) {
         if (nLevel == 0) initLevel0();
@@ -50,9 +56,53 @@ public class Game {
 	}
 	
 	private void initLevel1() {
+		this.nLevel = 1;
+		this.remainingTime = 100;
+
+		gameObjects = new GameObjectContainer();
+
+		for (int col = 0; col < 15; col++) { 		//sueloo
+			gameObjects.add(new Land(new Position(13, col)));
+			gameObjects.add(new Land(new Position(14, col)));
+		}
+
+		gameObjects.add(new Land(new Position(Game.DIM_Y - 3, 9))); 	//plataforma chulais
+		gameObjects.add(new Land(new Position(Game.DIM_Y - 3, 12)));
+
+		for (int col = 17; col < Game.DIM_X; col++) {
+			gameObjects.add(new Land(new Position(Game.DIM_Y - 2, col)));
+			gameObjects.add(new Land(new Position(Game.DIM_Y - 1, col)));
+		}
+
+		gameObjects.add(new Land(new Position(9, 2)));
+		gameObjects.add(new Land(new Position(9, 5)));
+		gameObjects.add(new Land(new Position(9, 6)));
+		gameObjects.add(new Land(new Position(9, 7)));
+		gameObjects.add(new Land(new Position(5, 6)));
+
+		int tamX = 8;
+		int posIniX = Game.DIM_X - 3 - tamX;
+		int posIniY = Game.DIM_Y - 3;
+		for (int col = 0; col < tamX; col++) {
+			for (int fila = 0; fila < col + 1; fila++) {
+				gameObjects.add(new Land(new Position(posIniY - fila, posIniX + col)));
+			}
+		}
+
+		gameObjects.add(new ExitDoor(new Position(Game.DIM_Y - 3, Game.DIM_X - 1)));  //puerta
+
+		this.mario = new Mario(this, new Position(Game.DIM_Y - 3, 0));  //personajes
+		gameObjects.add(this.mario);
+
+		//goombas D:
+		gameObjects.add(new Goomba(this, new Position(0, 19)));
+		gameObjects.add(new Goomba(this, new Position(5, 6)));
+		gameObjects.add(new Goomba(this, new Position(9, 6)));
+		gameObjects.add(new Goomba(this, new Position(12, 8)));
+		gameObjects.add(new Goomba(this, new Position(12, 11)));
+		gameObjects.add(new Goomba(this, new Position(12, 13)));
     
-    initLevel0();
-}
+	}
 	
 	private void initLevel0() {
 		this.nLevel = 0;
@@ -202,5 +252,17 @@ public class Game {
 		return actions;
 	}
 
+	public void setPlayerWon() {
+		this.finished = true;
+		this.playerWon = true;
+	}
+
+	public void doInteractionsFrom(Mario mario) {
+		gameObjects.doInteractionsFrom(mario);
+	}
+
+	public void addPoints(int pts) {
+		this.points += pts;
+	}
 
 }

@@ -32,7 +32,16 @@ public class Mario {
 	public boolean occupies(Position p) { //si es big tmb el la de arriba
         if (p.equals(pos)) return true;
         return big && p.equals(pos.translate(0, -1));
-    }
+   	}
+
+	public boolean isBig() {
+		return big;
+	}
+
+
+	public void setBig(boolean b) {
+		this.big = b;
+	}
 
 	public String getIcon() {
 		return (facing == Facing.LEFT) // condicion
@@ -110,6 +119,46 @@ public class Mario {
 				pos = new Position(r, nextC);
 			}
 		}
+
+		if (game.getGameObjectContainer().goombaAt(pos)) {  	//compruebo si le da a un bicho
+			game.marioDies();
+			return;
+		}
+
+		if (big) {  //si es grande tmb casilla de arriba
+			Position up = pos.translate(0, -1);
+			if (game.getGameObjectContainer().goombaAt(up)) {
+				game.marioDies();
+			}
+		}
+
+		if (game.getGameObjectContainer().exitDoorAt(pos)) {
+			game.setPlayerWon();
+		}
+
+		game.doInteractionsFrom(this);
+
+
+	}
+
+	public boolean interactWith(Goomba other) {
+		if (pos.equals(other.getPosition()) ||
+				(isBig() && pos.translate(0, -1).equals(other.getPosition()))) {
+
+			boolean falling = !game.getGameObjectContainer().isSolidAt(pos.translate(0, 1));
+
+			if (falling) {
+				other.receiveInteraction(this);
+			} else if (isBig()) {
+				big = false; //se hace chiquito
+				other.receiveInteraction(this);
+			} else {
+				game.marioDies(); //pierde vida y reinicia
+				return true;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

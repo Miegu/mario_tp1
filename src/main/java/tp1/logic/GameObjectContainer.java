@@ -67,6 +67,24 @@ public class GameObjectContainer {
 		}
 	}
 
+	public boolean goombaAt(Position p) {
+		for (int i = 0; i < nGoombas; i++) {
+			if (goombas[i] != null && goombas[i].getPosition().equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	public void doInteractionsFrom(Mario mario) {
+		for (int i = 0; i < nGoombas; i++) {
+			if (goombas[i] != null && goombas[i].isAlive()) {
+				mario.interactWith(goombas[i]);
+			}
+		}
+	}
+
 	//exit door no es solido, pero no puede estar sobre land
 	public void add(ExitDoor d) {
         if (d == null) return;
@@ -77,6 +95,10 @@ public class GameObjectContainer {
 		}
         exit = d; //si ya habia, sustituyo
     }
+
+	public boolean exitDoorAt(Position p) {
+		return exit != null && exit.getPosition().equals(p);
+	}
 
 	//mario no es solido, pero no puede estar sobre land
 	public void add(Mario m) {
@@ -121,6 +143,9 @@ public class GameObjectContainer {
 		for (int i = 0; i < nGoombas; i++) { // luego goombas
 			goombas[i].update();
 		}
+		doInteractionsFrom(mario);
+		clean();
+
 	}
 
 	public void clear(){
@@ -130,6 +155,16 @@ public class GameObjectContainer {
     	nGoombas = 0;
     	exit = null;
     	mario = null;
+	}
+
+	public void clean() {
+		int j = 0;
+		for (int i = 0; i < nGoombas; i++) {
+			if (goombas[i].isAlive()) {
+				goombas[j++] = goombas[i];
+			}
+		}
+		nGoombas = j;
 	}
 
 }
