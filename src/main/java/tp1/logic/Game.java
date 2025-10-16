@@ -2,9 +2,7 @@ package tp1.logic;
 
 import java.util.ArrayList;
 import java.util.List;
-//import tp1.logic.Position;
 import tp1.logic.gameobjects.*;
-//import tp1.view.Messages;
 
 public class Game {
 
@@ -26,7 +24,6 @@ public class Game {
 	private GameObjectContainer gameObjects = new GameObjectContainer();
 	private Mario mario;
 
-	private final List<Land> lands = new ArrayList<>();
 	private final ActionList actions = new ActionList();
 
 	public GameObjectContainer getGameObjectContainer() {
@@ -51,6 +48,8 @@ public class Game {
     	playerLost = false;
 	}
 	
+
+	//en este nivel mario empieza pequenito y hay mas de un goomba 
 	private void initLevel1() {
 		this.nLevel = 1;
 		this.remainingTime = 100;
@@ -88,7 +87,7 @@ public class Game {
 		gameObjects.add(new ExitDoor(new Position(Game.DIM_Y - 3, Game.DIM_X - 1)));  //puerta
 
 		this.mario = new Mario(this, new Position(Game.DIM_Y - 3, 0));  //personajes
-		this.mario.setBig(true);
+		this.mario.setBig(false); //si quisiera empezar big pues le pongo true
 		gameObjects.add(this.mario);
 
 		//goombas D:
@@ -126,7 +125,7 @@ public class Game {
 		gameObjects.add(new Land(new Position(5,6)));
 		
 		// Salto final
-		int tamX = 8, tamY= 8;
+		int tamX = 8;
 		int posIniX = Game.DIM_X-3-tamX, posIniY = Game.DIM_Y-3;
 		
 		for(int col = 0; col < tamX; col++) {
@@ -164,7 +163,7 @@ public class Game {
 	public void update() { //baja el tiempo uno si no ha acabado
 		if (finished) return;
 
-		gameObjects.updateAll();     //mueve mario y goombas
+		gameObjects.updateAll();//mueve mario y goombas
     	if (finished) return;
 
 		if (remainingTime > 0) {

@@ -22,8 +22,6 @@ public enum Action {
 	public int getY() {
 		return y;
 	}
-	
-	//TODO fill your code
 
 	public  static Action parse(String s){
 		if(s == null) throw new IllegalArgumentException("Action is null");

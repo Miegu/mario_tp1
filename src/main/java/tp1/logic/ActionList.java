@@ -1,6 +1,5 @@
 package tp1.logic;
 
-//import tp1.logic.Action;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +53,6 @@ public class ActionList {
     }
 
     public void add(List<Action> acts) { //varias
-        // actions.addAll(acts);
         List<Action> filtered = new ArrayList<>();
         
         for (Action a : acts) {

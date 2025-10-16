@@ -41,7 +41,6 @@ public class Mario {
 		return big;
 	}
 
-
 	public void setBig(boolean b) {
 		this.big = b;
 	}
@@ -60,6 +59,11 @@ public class Mario {
 	
 	/**
 	 *  Implements the automatic update	
+	 * 
+	 * Para el movimiento, Mario puede hacer 4 a la vez 
+	 * Para subir, puede hacerlo 4 bloques, pero despues cae uno cada turno 
+	 * no vuela :) pero si salta mucho
+	 * para esto uso didVerticalAction y onGround, y los saltitosLeft para que no me vuele
 	 */
 	
 	public void update() {
@@ -126,13 +130,14 @@ public class Mario {
 
 		//aplico gravedad SOLO SI NO HAY ACCION VERTICAL EEEE
 		Position below = pos.translate(0, 1);
-		boolean hasFloor = game.getGameObjectContainer().isSolidAt(below);
+		boolean hasFloor = isInsideBoard(below) && game.getGameObjectContainer().isSolidAt(below);
 
-		if (isInsideBoard(below) && !didVerticalAction && !hasFloor) {
+		if (!didVerticalAction && !hasFloor) {
 			pos = below;
 			falling = true;
 
-			if (pos.getRow() >= Game.DIM_Y) {
+			if (!isInsideBoard(pos)) {
+
 				game.marioDies();
 			}
 			return;
@@ -144,13 +149,13 @@ public class Mario {
 			int c = pos.getCol();
 			int nextC = c + dx;
 			Position next = new Position(r, nextC);
-			Position upperNext = next.translate(0, -1); //arriba
+			Position upNext = next.translate(0, -1); //arriba
 
 			boolean hitsWall = (nextC < 0 || nextC >= Game.DIM_X);
-			boolean landAhead = !hitsWall && game.getGameObjectContainer().isSolidAt(next);
-			boolean topBlocked = big && game.getGameObjectContainer().isSolidAt(upperNext);
+			boolean landFront = !hitsWall && game.getGameObjectContainer().isSolidAt(next);
+			boolean topBan = big && game.getGameObjectContainer().isSolidAt(upNext);
 
-			if (hitsWall || landAhead || topBlocked) {
+			if (hitsWall || landFront || topBan) {
 				dx = -dx;
 			} else {
 				pos = next;
@@ -177,8 +182,6 @@ public class Mario {
 
 		game.doInteractionsFrom(this);
 		this.falling = !game.getGameObjectContainer().isSolidAt(pos.translate(0, 1));
-
-
 
 	}
 

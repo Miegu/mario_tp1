@@ -20,25 +20,14 @@ public class GameObjectContainer {
 	//add sobrecargados
 
 	public boolean isSolidAt(Position p) {
-		for (int i = 0; i < nLands; i++) {
+		for (int i = 0; i < nLands; i++) {   //miro si hay un land en p
 			if (lands[i].getPosition().equals(p))
 				return true;
 		}
 		return false;
-		//for (int i = 0; i < nLands; i++) { //cosa dura suelo
-		//	if (lands[i].getPosition().equals(p))
-		//		return true;
-		//}
-
-		//for (int i = 0; i < nGoombas; i++) { //goombas D:
-		//	if (goombas[i].isAlive() && goombas[i].getPosition().equals(p))
-		//		return true;
-		//}
-
-		//return false;
 	}
 
-	public boolean hasEnemyAt(Position p) {
+	public boolean hasEnemyAt(Position p) { //miro si hay goomba que me quiera matar (para mario update y dibujar goomba)
 		for (int i = 0; i < nGoombas; i++) {
 			if (goombas[i].isAlive() && goombas[i].getPosition().equals(p))
 				return true;
@@ -135,22 +124,28 @@ public class GameObjectContainer {
 	//prioridad draw: mario, goombs, door, land, void
 
 	public String stringAt(Position p) {
+
+		if (mario != null) {
+			//patas de mario ALWAYS
+			if (mario.getPosition().equals(p)) {
+				return mario.getIcon();
+			}
+			
+			//cabezoncio solo si es big
+			if (mario.isBig() && mario.getPosition().translate(0, -1).equals(p)) {
+				return mario.getIcon();
+			}
+		}
 		
-		if (mario != null && mario.isBig() && p.equals(mario.getPosition().translate(0, -1))) {
-			return mario.getIcon(); // mario biGgg
-		}
-		if(mario  != null && mario.getPosition().equals(p)){
-			return mario.getIcon();
-		}
-		for (int i = 0; i < nGoombas; i++){
+		for (int i = 0; i < nGoombas; i++){ //goombas malos
 			if(goombas[i].getPosition().equals(p)){
 				return goombas[i].getIcon();
 			}
 		}
-		if (exit != null && exit.getPosition().equals(p)){
+		if (exit != null && exit.getPosition().equals(p)){ //puerta
 			return exit.getIcon();
 		}
-		for (int i = 0; i < nLands; i++){
+		for (int i = 0; i < nLands; i++){ //bloque
 			if(lands[i].getPosition().equals(p)){
 				return lands[i].getIcon();
 			}
@@ -162,8 +157,8 @@ public class GameObjectContainer {
 
 	public void updateAll() {
 		if (mario != null)
-			mario.update(); // primero Mario
-		for (int i = 0; i < nGoombas; i++) { // luego goombas
+			mario.update(); //primero mario
+		for (int i = 0; i < nGoombas; i++) { //luego goombas
 			goombas[i].update();
 		}
 		doInteractionsFrom(mario);
@@ -171,7 +166,7 @@ public class GameObjectContainer {
 
 	}
 
-	public void clear(){
+	public void clear(){  //mato todo y reseteo contadores, para el reset
 		for (int i=0; i<nLands; i++) lands[i]=null;
 		for (int i=0; i<nGoombas; i++) goombas[i]=null;
 		nLands = 0;
@@ -180,7 +175,7 @@ public class GameObjectContainer {
     	mario = null;
 	}
 
-	public void clean() {
+	public void clean() { //elimina goomba muerto
 		int j = 0;
 		for (int i = 0; i < nGoombas; i++) {
 			if (goombas[i].isAlive()) {

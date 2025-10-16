@@ -1,6 +1,5 @@
 package tp1.control;
 
-
 import tp1.logic.Game;
 import tp1.logic.Action;
 import tp1.view.GameView;
@@ -23,8 +22,6 @@ public class Controller {
 	 * Runs the game logic, coordinate Model(game) and View(view)
 	 * 
 	 */
-	
-
 	
 	public void run() {
 		view.showWelcome();
