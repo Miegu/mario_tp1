@@ -13,6 +13,9 @@ public class Mario {
 	private int dx = +1;
 	private Facing facing = Facing.RIGHT;
 	private boolean big = false;  //si fuera true, ocuparia la tile de arriba
+	private boolean falling;
+
+	private int saltitosLeft = 0;
 
 	
 	public Mario(Game game, Position pos) {
@@ -44,9 +47,15 @@ public class Mario {
 	}
 
 	public String getIcon() {
-		return (facing == Facing.LEFT) // condicion
-				? tp1.view.Messages.MARIO_LEFT // si true
-				: tp1.view.Messages.MARIO_RIGHT; // si false
+		if (dx == 0) {
+			return tp1.view.Messages.MARIO_STOP;
+		} else {
+			if (facing == Facing.LEFT) {
+				return tp1.view.Messages.MARIO_LEFT;
+			} else {
+				return tp1.view.Messages.MARIO_RIGHT;
+			}
+		}
 	}
 	
 	/**
@@ -55,35 +64,58 @@ public class Mario {
 	
 	public void update() {
 		boolean moved = false;
+		boolean didVerticalAction = false;
+		boolean onGround = isOnGround();
+		if (onGround)
+			saltitosLeft = 4;
+
 
 		while (!game.getActions().isEmpty()) {
 			Action act = game.getActions().extract();
-
+	
 			switch (act) {
 				case LEFT:
 					dx = -1;
-					pos = pos.translate(dx, 0);
-					moved = true;
+					Position left = pos.translate(dx, 0);
+					if (isInsideBoard(left) && !game.getGameObjectContainer().isSolidAt(left)) {
+						pos = left;
+						moved = true;
+					}
+					facing = Facing.LEFT;
 					break;
 
 				case RIGHT:
 					dx = 1;
-					pos = pos.translate(dx, 0);
-					moved = true;
+					Position right = pos.translate(dx, 0);
+					if (isInsideBoard(right) && !game.getGameObjectContainer().isSolidAt(right)) {
+						pos = right;
+						moved = true;
+					}
+					facing = Facing.RIGHT;
 					break;
 
 				case UP:
-					pos = pos.translate(0, -1);
-					moved = true;
+					if (saltitosLeft > 0) {
+						Position up = pos.translate(0, -1);
+						Position up2 = big ? pos.translate(0, -2) : up;  //si mi mario es big pos que no se mate
+						if (isInsideBoard(up2) && !game.getGameObjectContainer().isSolidAt(up2)) {
+							pos = up;
+							moved = true;
+							saltitosLeft--;
+							didVerticalAction = true;
+						}
+					}
 					break;
 
 				case DOWN:
-					while (!tp1.view.Messages.LAND.equals(
-							game.positionToString(pos.getCol(), pos.getRow() + 1))) {
-						pos = pos.translate(0, 1);
+					Position next = pos.translate(0, 1);
+					while (isInsideBoard(next) && !game.getGameObjectContainer().isSolidAt(next)) {
+						pos = next;
+						next = pos.translate(0, 1);
 					}
-					dx = 0; //para x
+					dx = 0;
 					moved = true;
+					didVerticalAction = true;
 					break;
 
 				case STOP:
@@ -92,43 +124,50 @@ public class Mario {
 			}
 		}
 
-		//movimiento automático
+		//aplico gravedad SOLO SI NO HAY ACCION VERTICAL EEEE
+		Position below = pos.translate(0, 1);
+		boolean hasFloor = game.getGameObjectContainer().isSolidAt(below);
+
+		if (isInsideBoard(below) && !didVerticalAction && !hasFloor) {
+			pos = below;
+			falling = true;
+
+			if (pos.getRow() >= Game.DIM_Y) {
+				game.marioDies();
+			}
+			return;
+		}
+
+		//si no se mueve lo muevo automaticamente lateralll
 		if (!moved) {
 			int r = pos.getRow();
 			int c = pos.getCol();
-
-			String below = game.positionToString(c, r + 1);
-			boolean hasFloor = tp1.view.Messages.LAND.equals(below);
-
-			if (!hasFloor) {
-				pos = new Position(r + 1, c);
-				if (pos.getRow() >= Game.DIM_Y) {
-					game.marioDies();
-				}
-				return;
-			}
-
 			int nextC = c + dx;
-			boolean hitsWall = (nextC < 0 || nextC >= Game.DIM_X);
-			boolean landAhead = !hitsWall && tp1.view.Messages.LAND.equals(
-					game.positionToString(nextC, r));
+			Position next = new Position(r, nextC);
+			Position upperNext = next.translate(0, -1); //arriba
 
-			if (hitsWall || landAhead) {
+			boolean hitsWall = (nextC < 0 || nextC >= Game.DIM_X);
+			boolean landAhead = !hitsWall && game.getGameObjectContainer().isSolidAt(next);
+			boolean topBlocked = big && game.getGameObjectContainer().isSolidAt(upperNext);
+
+			if (hitsWall || landAhead || topBlocked) {
 				dx = -dx;
 			} else {
-				pos = new Position(r, nextC);
+				pos = next;
 			}
 		}
 
-		if (game.getGameObjectContainer().goombaAt(pos)) {  	//compruebo si le da a un bicho
+		//compruebo si le da a un bicho
+		if (game.getGameObjectContainer().hasEnemyAt(pos)) {
 			game.marioDies();
 			return;
 		}
 
 		if (big) {  //si es grande tmb casilla de arriba
 			Position up = pos.translate(0, -1);
-			if (game.getGameObjectContainer().goombaAt(up)) {
+			if (game.getGameObjectContainer().hasEnemyAt(up)) {
 				game.marioDies();
+				return;
 			}
 		}
 
@@ -137,6 +176,8 @@ public class Mario {
 		}
 
 		game.doInteractionsFrom(this);
+		this.falling = !game.getGameObjectContainer().isSolidAt(pos.translate(0, 1));
+
 
 
 	}
@@ -145,7 +186,7 @@ public class Mario {
 		if (pos.equals(other.getPosition()) ||
 				(isBig() && pos.translate(0, -1).equals(other.getPosition()))) {
 
-			boolean falling = !game.getGameObjectContainer().isSolidAt(pos.translate(0, 1));
+			boolean falling = this.falling;
 
 			if (falling) {
 				other.receiveInteraction(this);
@@ -159,6 +200,16 @@ public class Mario {
 			return true;
 		}
 		return false;
+	}
+
+	private boolean isOnGround() {
+		Position below = pos.translate(0, 1);
+		return game.getGameObjectContainer().isSolidAt(below);
+	}
+
+	private boolean isInsideBoard(Position p) {
+		return p.getRow() >= 0 && p.getRow() < Game.DIM_Y &&
+				p.getCol() >= 0 && p.getCol() < Game.DIM_X;
 	}
 
 }

@@ -34,6 +34,7 @@ public class Goomba {
     }
     
     public void update() {
+         
         int r = pos.getRow();
         int c = pos.getCol();
 
@@ -61,12 +62,14 @@ public class Goomba {
         }
 
         pos = new Position(r, nextC);//delante
+        
     }
  
     public boolean receiveInteraction(Mario other) {
         this.alive = false;
         game.addPoints(100);
         return true;
+        
     }
 
 

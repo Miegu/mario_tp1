@@ -2,11 +2,6 @@ package tp1.logic;
 
 import java.util.Objects;
 
-/**
- * 
- * TODO: Immutable class to encapsulate and manipulate positions in the game board
- * 
- */
 public final class Position {
 
 	private final int col;
@@ -21,7 +16,7 @@ public final class Position {
 	public int getCol() { return col; }
 	
 	public Position translate(int dx, int dy){
-		return new Position(row + dy, col + dx);  //dy filas, dx columnas
+		return new Position(row + dy, col + dx);  //dy filas dx columnas
 	}
 
 	public boolean isInBounds(int width, int height){
@@ -29,11 +24,19 @@ public final class Position {
 	}
 
 	@Override
-	public boolean equals(Object o){
-		if(this == o) return  true; //mismo objeto, iguales
-		if (!(o instanceof Position)) return false; //si no es position no
-        Position p = (Position) o; 
-        return row == p.row && col == p.col;  //comparo que sean iguales
+	public boolean equals(Object o) {
+
+		//me banearon el uso de instanceof :(
+		// if(this == o) return true; //mismo objeto, iguales
+		// if (!(o instanceof Position)) return false; //si no es position no
+		// Position p = (Position) o;
+		// return row == p.row && col == p.col; //comparo que sean iguales
+
+		if (o == null || o.getClass() != getClass())
+			return false;
+		Position p = (Position) o;
+		return row == p.row && col == p.col;
+
 	}
 	@Override 
 	public int hashCode() { return Objects.hash(row, col); }

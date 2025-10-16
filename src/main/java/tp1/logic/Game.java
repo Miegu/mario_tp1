@@ -2,9 +2,9 @@ package tp1.logic;
 
 import java.util.ArrayList;
 import java.util.List;
-import tp1.logic.Position;
+//import tp1.logic.Position;
 import tp1.logic.gameobjects.*;
-import tp1.view.Messages;
+//import tp1.view.Messages;
 
 public class Game {
 
@@ -41,10 +41,6 @@ public class Game {
 		else
 			initLevel1();
 	}
-	 private void initLevel(int nLevel) {
-        if (nLevel == 0) initLevel0();
-        else initLevel1();
-    }
 	
 	private void resetScoreAndState() {
     	remainingTime = 100;
@@ -92,6 +88,7 @@ public class Game {
 		gameObjects.add(new ExitDoor(new Position(Game.DIM_Y - 3, Game.DIM_X - 1)));  //puerta
 
 		this.mario = new Mario(this, new Position(Game.DIM_Y - 3, 0));  //personajes
+		this.mario.setBig(true);
 		gameObjects.add(this.mario);
 
 		//goombas D:
@@ -167,7 +164,7 @@ public class Game {
 	public void update() { //baja el tiempo uno si no ha acabado
 		if (finished) return;
 
-		gameObjects.updateAll();     // mueve Mario y Goombas aquí
+		gameObjects.updateAll();     //mueve mario y goombas
     	if (finished) return;
 
 		if (remainingTime > 0) {
@@ -177,6 +174,8 @@ public class Game {
 				playerLost = true;
 			}
 		}
+
+		actions.clear(); //a ver si me soluciona el tremendo bug del up :')
 	}
 
 	public void reset(Integer mayLevel){
@@ -189,7 +188,7 @@ public class Game {
     	if (target == 0) initLevel0();
     	else             initLevel1();
 
-    	this.points   = keepPoints;//conserva
+    	this.points   = keepPoints;
     	this.numLives = keepLives;
 	}
 
@@ -245,7 +244,9 @@ public class Game {
 	}	
 
 	public void addAction(Action a) {
-		actions.add(a);
+		List<Action> acciones = new ArrayList<>();
+		acciones.add(a);
+		actions.add(acciones);
 	}
 
 	public ActionList getActions() {

@@ -25,6 +25,25 @@ public class GameObjectContainer {
 				return true;
 		}
 		return false;
+		//for (int i = 0; i < nLands; i++) { //cosa dura suelo
+		//	if (lands[i].getPosition().equals(p))
+		//		return true;
+		//}
+
+		//for (int i = 0; i < nGoombas; i++) { //goombas D:
+		//	if (goombas[i].isAlive() && goombas[i].getPosition().equals(p))
+		//		return true;
+		//}
+
+		//return false;
+	}
+
+	public boolean hasEnemyAt(Position p) {
+		for (int i = 0; i < nGoombas; i++) {
+			if (goombas[i].isAlive() && goombas[i].getPosition().equals(p))
+				return true;
+		}
+		return false;
 	}
 
 	//Land es solid
@@ -116,6 +135,10 @@ public class GameObjectContainer {
 	//prioridad draw: mario, goombs, door, land, void
 
 	public String stringAt(Position p) {
+		
+		if (mario != null && mario.isBig() && p.equals(mario.getPosition().translate(0, -1))) {
+			return mario.getIcon(); // mario biGgg
+		}
 		if(mario  != null && mario.getPosition().equals(p)){
 			return mario.getIcon();
 		}
